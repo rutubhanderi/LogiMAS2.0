@@ -1,15 +1,19 @@
 package com.logistics.shipment_tracker.repository;
 
 import com.logistics.shipment_tracker.model.Shipment;
+import com.logistics.shipment_tracker.model.ShipmentStatus;
 import com.logistics.shipment_tracker.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
+@Repository
 public interface ShipmentRepository extends JpaRepository<Shipment, Long> {
-    Optional<Shipment> findByOrderId(String orderId);
-    
-    List<Shipment> findByAssignedDriver(User driver);
-    
-    List<Shipment> findByStatus(String status);
+
+    List<Shipment> findByCustomer(User customer);
+
+    List<Shipment> findByDriver(User driver);
+
+    List<Shipment> findByStatus(ShipmentStatus status);
 }

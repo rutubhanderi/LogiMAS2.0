@@ -1,49 +1,30 @@
 package com.logistics.shipment_tracker.controller;
 
-import com.logistics.shipment_tracker.model.User;
-import com.logistics.shipment_tracker.security.CustomUserDetails;
-import com.logistics.shipment_tracker.security.CustomUserDetailsService;
-import com.logistics.shipment_tracker.security.JwtUtil;
+import com.logistics.shipment_tracker.dto.AuthenticationRequest;
+import com.logistics.shipment_tracker.dto.AuthenticationResponse;
+import com.logistics.shipment_tracker.dto.UserDto;
+import com.logistics.shipment_tracker.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
     @Autowired
-    private AuthenticationManager authenticationManager;
+    private AuthService authService;
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    @PostMapping("/register")
+    public ResponseEntity<?> registerUser(@RequestBody UserDto userDto) {
+        return ResponseEntity.ok(authService.registerUser(userDto));
+    }
 
-    @Autowired
-    private JwtUtil jwtUtil;
-
-    // ---------------- LOGIN ----------------
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody User loginRequest) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            loginRequest.getEmail(),
-                            loginRequest.getPassword()
-                    )
-            );
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.status(401).body("Invalid credentials");
-        }
-
-        CustomUserDetails userDetails = (CustomUserDetails)
-                userDetailsService.loadUserByUsername(loginRequest.getEmail());
-
-        String jwt = jwtUtil.generateToken(userDetails.getUsername(),
-                userDetails.getAuthorities().iterator().next().getAuthority());
-
-        return ResponseEntity.ok(jwt);
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest authenticationRequest) {
+        return ResponseEntity.ok(authService.login(authenticationRequest));
     }
 }

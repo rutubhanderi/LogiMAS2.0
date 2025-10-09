@@ -22,10 +22,10 @@ public class AdminSeeder implements CommandLineRunner {
         String adminEmail = "admin@logistics.com";
 
         // Check if admin already exists
-        if (userRepository.findByEmail(adminEmail).isEmpty()) {
+        if (userRepository.findByUsername("admin").isEmpty()) {
             // Create new admin user
             User admin = new User();
-            admin.setName("Admin User");
+            admin.setUsername("admin");
             admin.setEmail(adminEmail);
             admin.setPassword(passwordEncoder.encode("admin1234")); // strong password
             admin.setRole(Role.ADMIN);

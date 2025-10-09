@@ -1,112 +1,121 @@
 package com.logistics.shipment_tracker.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import java.time.LocalDateTime;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 @Entity
 @Table(name = "shipments")
 public class Shipment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "shipment_id")
+    private Long shipmentId;
 
-    @NotBlank
-    @Column(unique = true, nullable = false)
-    private String orderId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_id", nullable = false)
+    private User customer;
 
-    @NotBlank
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "driver_id")
+    private User driver;
+
+    @NotBlank(message = "Origin is mandatory")
     @Column(nullable = false)
     private String origin;
 
-    @NotBlank
+    @NotBlank(message = "Destination is mandatory")
     @Column(nullable = false)
     private String destination;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ShipmentStatus status;
 
-    private LocalDateTime expectedArrival;
+    @Column(name = "eta")
+    private LocalDateTime eta;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "driver_id",nullable= true)
-    private User assignedDriver;
+	public Long getShipmentId() {
+		return shipmentId;
+	}
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = true)
-    private User customer;
+	public void setShipmentId(Long shipmentId) {
+		this.shipmentId = shipmentId;
+	}
 
-    // Constructors
-    public Shipment() {}
+	public User getCustomer() {
+		return customer;
+	}
 
-    public Shipment(String orderId, String origin, String destination, ShipmentStatus status, LocalDateTime expectedArrival) {
-        this.orderId = orderId;
-        this.origin = origin;
-        this.destination = destination;
-        this.status = status;
-        this.expectedArrival = expectedArrival;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
-    }
+	public void setCustomer(User customer) {
+		this.customer = customer;
+	}
 
-    // Lifecycle callbacks
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = this.createdAt;
-    }
+	public User getDriver() {
+		return driver;
+	}
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
-    
+	public void setDriver(User driver) {
+		this.driver = driver;
+	}
 
-    // Getters and Setters
-    public Long getId() { return id; }
+	public String getOrigin() {
+		return origin;
+	}
 
-    public void setId(Long id) { this.id = id; }
+	public void setOrigin(String origin) {
+		this.origin = origin;
+	}
 
-    public String getOrderId() { return orderId; }
+	public String getDestination() {
+		return destination;
+	}
 
-    public void setOrderId(String orderId) { this.orderId = orderId; }
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
 
-    public String getOrigin() { return origin; }
+	public ShipmentStatus getStatus() {
+		return status;
+	}
 
-    public void setOrigin(String origin) { this.origin = origin; }
+	public void setStatus(ShipmentStatus status) {
+		this.status = status;
+	}
 
-    public String getDestination() { return destination; }
+	public LocalDateTime getEta() {
+		return eta;
+	}
 
-    public void setDestination(String destination) { this.destination = destination; }
+	public void setEta(LocalDateTime eta) {
+		this.eta = eta;
+	}
 
-    public ShipmentStatus getStatus() { return status; }
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
 
-    public void setStatus(ShipmentStatus status) { this.status = status; }
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 
-    public LocalDateTime getExpectedArrival() { return expectedArrival; }
+	public LocalDateTime getUpdatedAt() {
+		return updatedAt;
+	}
 
-    public void setExpectedArrival(LocalDateTime expectedArrival) { this.expectedArrival = expectedArrival; }
-
-    public LocalDateTime getCreatedAt() { return createdAt; }
-
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
-
-    public LocalDateTime getUpdatedAt() { return updatedAt; }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
-
-    public User getAssignedDriver() { return assignedDriver; }
-
-    public void setAssignedDriver(User assignedDriver) { this.assignedDriver = assignedDriver; }
-
-    public User getCustomer() { return customer; }
-    public void setCustomer(User customer) { this.customer = customer; }
+	public void setUpdatedAt(LocalDateTime updatedAt) {
+		this.updatedAt = updatedAt;
+	}
 }
