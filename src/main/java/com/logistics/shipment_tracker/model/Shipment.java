@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotBlank;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,10 +21,12 @@ public class Shipment {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User customer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private User driver;
 
     @NotBlank(message = "Origin is mandatory")
@@ -37,7 +42,7 @@ public class Shipment {
     private ShipmentStatus status;
 
     @Column(name = "eta")
-    private LocalDateTime eta;
+    private LocalDate eta;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -95,12 +100,12 @@ public class Shipment {
 		this.status = status;
 	}
 
-	public LocalDateTime getEta() {
+	public LocalDate getEta() {
 		return eta;
 	}
 
-	public void setEta(LocalDateTime eta) {
-		this.eta = eta;
+	public void setEta(LocalDate eta2) {
+		this.eta = eta2;
 	}
 
 	public LocalDateTime getCreatedAt() {

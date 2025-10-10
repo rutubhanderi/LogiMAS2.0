@@ -1,8 +1,11 @@
-package com.logistics.shipment_tracker.controller;
+	package com.logistics.shipment_tracker.controller;
 
+import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -32,9 +35,20 @@ public class DriverController {
         return ResponseEntity.ok(shipmentService.getShipmentsByDriver(driverId));
     }
 
-    @PutMapping("/shipments/{id}/status")
-    public ResponseEntity<Shipment> updateShipmentStatus(@PathVariable Long id, @RequestParam ShipmentStatus status, @AuthenticationPrincipal CustomUserDetails userDetails) {
+    @PutMapping("/shipments/{id}/update")
+    public ResponseEntity<Shipment> updateShipmentStatusAndEta(
+            @PathVariable Long id,
+            @RequestParam(required = false) ShipmentStatus status,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate eta,
+            @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
+
         Long driverId = userDetails.getId();
-        return ResponseEntity.ok(shipmentService.updateShipmentStatus(id, status, driverId));
+
+        return ResponseEntity.ok(
+            shipmentService.updateShipmentStatusAndEta(id, status, eta, driverId)
+        );
     }
+
+
+
 }

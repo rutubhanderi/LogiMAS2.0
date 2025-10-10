@@ -40,13 +40,19 @@ public class AuthService {
             throw new RuntimeException("Email already exists");
         }
 
+        if ("ADMIN".equalsIgnoreCase(userDto.getRole().name())) {
+            throw new RuntimeException("Admin registration is not allowed");
+        }
+
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
         user.setRole(userDto.getRole());
+
         return userRepository.save(user);
     }
+
 
     public AuthenticationResponse login(AuthenticationRequest authenticationRequest) {
         authenticationManager.authenticate(

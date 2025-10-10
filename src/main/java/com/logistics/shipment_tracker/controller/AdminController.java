@@ -1,5 +1,6 @@
 package com.logistics.shipment_tracker.controller;
 
+import com.logistics.shipment_tracker.config.security.CustomUserDetails;
 import com.logistics.shipment_tracker.dto.ShipmentDto;
 import com.logistics.shipment_tracker.model.Shipment;
 import com.logistics.shipment_tracker.model.User;
@@ -8,8 +9,10 @@ import com.logistics.shipment_tracker.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -33,12 +36,20 @@ public class AdminController {
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserById(id));
     }
+    @GetMapping("/email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(userService.getUserByEmail(email));
+    }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
+    public ResponseEntity<Void> deleteUser(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
+
+        userService.deleteUser(id, userDetails);
         return ResponseEntity.noContent().build();
     }
+
 
     @PutMapping("/users/{id}")
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody com.logistics.shipment_tracker.dto.UserDto userDto) {
@@ -51,11 +62,11 @@ public class AdminController {
         return shipmentService.getAllShipments();
     }
 
-    @PostMapping("/shipments")
-    public ResponseEntity<Shipment> createShipment(@RequestBody ShipmentDto shipmentDto) {
-        // Assuming customerId is part of the DTO or handled differently
-        return ResponseEntity.ok(shipmentService.createShipment(shipmentDto, shipmentDto.getCustomerId()));
-    }
+//    @PostMapping("/shipments")
+//    public ResponseEntity<Shipment> createShipment(@RequestBody ShipmentDto shipmentDto) {
+//        // Assuming customerId is part of the DTO or handled differently
+//        return ResponseEntity.ok(shipmentService.createShipment(shipmentDto, shipmentDto.getCustomerId()));
+//    }
 
     @PutMapping("/shipments/{id}/assign-driver/{driverId}")
     public ResponseEntity<Shipment> assignDriverToShipment(@PathVariable Long id, @PathVariable Long driverId) {

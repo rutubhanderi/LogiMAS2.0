@@ -1,5 +1,6 @@
 package com.logistics.shipment_tracker.controller;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.logistics.shipment_tracker.config.security.CustomUserDetails;
 import com.logistics.shipment_tracker.dto.ShipmentDto;
+import com.logistics.shipment_tracker.dto.ShipmentTrackingDto;
 import com.logistics.shipment_tracker.model.Shipment;
 import com.logistics.shipment_tracker.service.ShipmentService;
 
@@ -44,4 +46,26 @@ public class CustomerController {
         Long customerId = userDetails.getId();
         return ResponseEntity.ok(shipmentService.updateShipment(id, shipmentDto, customerId));
     }
+    
+    @GetMapping("/tracking/all")
+    public ResponseEntity<List<ShipmentTrackingDto>> trackShipments(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        Long customerId = userDetails.getId();
+        List<ShipmentTrackingDto> trackingInfo = shipmentService.getCustomerShipments(customerId);
+        return ResponseEntity.ok(trackingInfo);
+    }
+    
+    @GetMapping("/tracking/{id}")
+    public ResponseEntity<ShipmentTrackingDto> trackShipmentById(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails) throws AccessDeniedException {
+
+        Long customerId = userDetails.getId();
+        ShipmentTrackingDto trackingInfo = shipmentService.getCustomerShipmentById(customerId, id);
+        return ResponseEntity.ok(trackingInfo);
+    }
+
+
+
+    
+    
 }
